@@ -1,8 +1,8 @@
-const express = require('express');
-const os = require('os');
+const http = require('http');
+const app = require('./app');
 
-const app = express();
+const server = http.createServer(app);
 
-app.use(express.static('dist'));
-app.get('/api/getUsername', (req, res) => res.send({ username: os.userInfo().username }));
-app.listen(8080, () => console.log('Listening on port 8080!'));
+server.listen(9000, function(){
+    console.log('Express server listening on port ' + '9000');
+});

@@ -1,23 +1,54 @@
 import React, { Component } from 'react';
-import './app.css';
-import ReactImage from './react.png';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Teams from './Components/Teams';
+import Team from './Components/Team';
+import Landing from './Components/Landing';
+import CreateTourney from './Components/CreateTourney';
+import axios from 'axios';
+import qs from 'qs';
+import './App.css'
 
-export default class App extends Component {
-  state = { username: null };
+class App extends Component {
+  constructor(){
+    super();
+    this.state = {
+      display: 'landing',
+      loginSummoner: "",
+      loginPassword: "",
+      summonerNameJoin: "",
+      summonerIconJoin: 1,
+      submit: false,
+      loginError: "",
+      session: false
+    }
+  }
 
   componentDidMount() {
-    fetch('/api/getUsername')
-      .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
+    axios.post('/', qs.stringify(this.state))
+    .then(res => {
+      if (res.data === "session") {
+        this.setState({session: true})
+      }
+    })
   }
 
   render() {
-    const { username } = this.state;
     return (
-      <div>
-        {username ? <h1>{`Hello ${username}`}</h1> : <h1>Loading.. please wait!</h1>}
-        <img src={ReactImage} alt="react" />
-      </div>
+      <Router>
+        <div className="App">
+          <Route path="/" exact render={(state) => (
+            this.state.session === true
+            ? <CreateTourney />
+            : <Landing  />
+          )} />
+          <Route path="/:tourney" exact render={({match}) => (
+            <Teams params={match.params}/> )} />
+          <Route path="/:tourney/:team" render={({match}) => (
+            <Team params={match.params}/> )} />
+        </div>
+      </Router>
     );
   }
 }
+
+export default App;
